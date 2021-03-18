@@ -12,3 +12,8 @@ First iteration:
 Runtime: 120 ms, faster than 29.88% of C# online submissions for Valid Sudoku.
 Memory Usage: 28.1 MB, less than 83.25% of C# online submissions for Valid Sudoku.
 
+
+Second iteration:
+
+Runtime: 112 ms, faster than 59.24% of C# online submissions for Valid Sudoku.
+Memory Usage: 28.5 MB, less than 10.19% of C# online submissions for Valid Sudoku.
