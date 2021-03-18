@@ -7,6 +7,13 @@ namespace LeetcodeValidSudoku
 {
     public class Solution
     {
+        private const int MaxDuplicateNumbersAllowedInAColumn = 1;
+        private const int MaxDuplicateNumbersAllowedOnARow = 1;
+        private const int MaxDuplicateNumbersAllowedInACell = 1;
+
+
+        // Used to record quantity of numbers in columns.
+        // For example, key "6_2" means "How many number 2's are in column 6?"
         private Dictionary<string, int> ColumnCountDictionary { get; set; }
         private Dictionary<string, int> RowCountDictionary { get; set; }
         private Dictionary<string, int> CellCountDictionary { get; set; }
@@ -17,34 +24,32 @@ namespace LeetcodeValidSudoku
             RowCountDictionary = new Dictionary<string, int>();
             CellCountDictionary = new Dictionary<string, int>();
 
-            AnalyzeBoard(board);
-
-            return
-                AllCellsHaveUniqueNumbers() &&
-                AllRowsHaveUniqueNumbers() &&
-                AllColumnsHaveUniqueNumbers();
-        }
-
-
-
-        private void AnalyzeBoard(char[][] board)
-        {
-            for(int i=0; i<9; i++)
-                for (int j=0; j<9; j++)
+            for (int row = 0; row < 9; row++)
+                for (int col = 0; col < 9; col++)
                 {
-                    var number = board[i][j];
-                    if (number >= '0' && number <='9')
+                    var number = board[row][col];
+                    if (number >= '0' && number <= '9')
                     {
-                        Increment(ColumnCountDictionary, (j + "_" + number));
-                        Increment(RowCountDictionary, (i + "_" + number));
+                        if (Increment(ColumnCountDictionary, (col + "_" + number)) > MaxDuplicateNumbersAllowedInAColumn)
+                            return false;
 
-                        var whatCellIsNumberIn = GetCellNumber(j,i);
+                        if (Increment(RowCountDictionary, (row + "_" + number)) > MaxDuplicateNumbersAllowedOnARow)
+                            return false;
 
-                        Increment(CellCountDictionary, (whatCellIsNumberIn + "_" + number));
+                        var whatCellIsNumberIn = GetCellNumber(col, row);
+                        if (Increment(CellCountDictionary, (whatCellIsNumberIn + "_" + number)) > MaxDuplicateNumbersAllowedInACell)
+                            return false;
                     }
                 }
+
+            return true;
         }
 
+
+
+
+
+        // Yes, I know this definitely can be optimised...
         private int GetCellNumber(int x, int y)
         {
             if (y<3)
@@ -65,28 +70,16 @@ namespace LeetcodeValidSudoku
             throw new InvalidOperationException("Not meant to happen!");
         }
 
-        private void Increment(IDictionary<string, int> dictionary, string key)
+        private int Increment(IDictionary<string, int> dictionary, string key)
         {
             if (!dictionary.ContainsKey(key))
                 dictionary[key] = 1;
             else
                 dictionary[key]++;
+
+            return dictionary[key];
         }
 
 
-        private bool AllCellsHaveUniqueNumbers()
-        {
-            return CellCountDictionary.All(x => x.Value <= 1);
-        }
-
-        private bool AllColumnsHaveUniqueNumbers()
-        {
-            return ColumnCountDictionary.All(x => x.Value <= 1);
-        }
-
-        private bool AllRowsHaveUniqueNumbers()
-        {
-            return RowCountDictionary.All(x => x.Value <= 1);
-        }
     }
 }
